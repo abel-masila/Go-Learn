@@ -14,7 +14,7 @@ func main() {
 		log.Fatal(err)
 	}
 	for _, item := range items {
-		fmt.Println(item.Title)
+		fmt.Println(item)
 	}
 
 }

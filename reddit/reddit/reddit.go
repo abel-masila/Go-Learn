@@ -16,13 +16,36 @@ type Response struct {
 }
 
 type Item struct {
-	Title string
-	URL   string
+	Title    string
+	URL      string
+	Comments int `json:"num_comments"`
+}
+
+const UserAgent = "script:reddit.reader:v0.14 (by /u/Ptk7l2)"
+
+func (i Item) String() string {
+	com := ""
+	switch i.Comments {
+	case 0:
+		// nothing
+	case 1:
+		com = " (1 comment)"
+	default:
+		com = fmt.Sprintf(" (%d comments)", i.Comments)
+	}
+	return fmt.Sprintf("%s%s\n%s", i.Title, com, i.URL)
 }
 
 func Get(reddit string) ([]Item, error) {
 	url := fmt.Sprintf("http://reddit.com/r/%s.json", reddit)
-	resp, err := http.Get(url)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", UserAgent)
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
